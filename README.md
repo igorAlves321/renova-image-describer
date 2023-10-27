@@ -1,2 +1,1 @@
 # -renova-image-describer
-#teste
