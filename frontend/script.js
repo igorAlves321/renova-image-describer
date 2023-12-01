@@ -19,6 +19,7 @@ function imageEvents() {
 
             fileImage.src = event.target.result
             contentImage = fileImage.src
+            navigator.clipboard.writeText(contentImage)
             fileImage.removeAttribute("alt")
 
         }
