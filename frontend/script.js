@@ -1,19 +1,19 @@
 //Criar áudio e carregar no buffer
-let musicLoop = new Audio
+const musicLoop = new Audio
 musicLoop.src = "loop.mp3"
 musicLoop.loop = true
 musicLoop.volume = 0.3
 
-let btnAddImage = document.getElementById("btnAddFile")
-let contentImage = ""
-let dvResultado = document.getElementById("resultado")
-let fileImage = document.getElementById("fileImage")
+const btnAddImage = document.getElementById("btnAddFile")
+const dvResult = document.getElementById("result")
+const fileImage = document.getElementById("fileImage")
+const btnCopyText = document.getElementById("btnCopyText")
 
 btnAddImage.addEventListener("click", imageEvents)
 
 function imageEvents() {
 
-    let inptImage = document.getElementById("inptFile")
+    const inptImage = document.getElementById("inptFile")
 
     inptImage.click()
     inptImage.addEventListener("change", readImage, false)
@@ -25,12 +25,11 @@ function imageEvents() {
         fr.onload = async function (event) {
 
             fileImage.src = event.target.result
-            contentImage = fileImage.src
             const json = {
-                image: contentImage
+                image: fileImage.src
             }
             musicLoop.play()
-            dvResultado.innerHTML = "Processando..."
+        dvResult.innerHTML = "Processando..."
             try {
                 const result = await fetch("http://localhost:3000", {
                     method: "POST",
@@ -43,10 +42,12 @@ function imageEvents() {
                 let data = await result.json()
                 data = data.data
                 fileImage.setAttribute("alt", data)
-                dvResultado.innerHTML = ""
+            dvResult.innerHTML = ""
+                btnCopyText.style.display = "block"
             } catch (err) {
                 console.log("Erro ao obter informações do servidor")
-                dvResultado.innerHTML = "Erro ao obter informações do servidor."
+                btnCopyText.style.display = "none"
+            dvResult.innerHTML = "Erro ao obter informações do servidor."
             }
 
             musicLoop.pause()
@@ -54,9 +55,24 @@ function imageEvents() {
 
         }
         fr.readAsDataURL(this.files[0])
+        
+        setTimeout(() => {
+            btnAddImage.focus()
+        }, 600)
     }
 }
 
-fileImage.addEventListener("click", (() => {
-    navigator.clipboard.writeText(fileImage.alt)
-}))
+btnCopyText.addEventListener("click", function() {
+    if (!fileImage.alt) {
+    dvResult.innerHTML = "Selecione uma imagem"
+        setTimeout(() => {
+        dvResult.innerHTML = ""
+        }, 5000)
+    } else {
+        navigator.clipboard.writeText(fileImage.alt)
+    dvResult.innerHTML = "Texto copiado!"
+        setTimeout(() => {
+        dvResult.innerHTML = ""
+        }, 5000)
+    }
+})

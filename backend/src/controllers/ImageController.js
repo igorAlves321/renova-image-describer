@@ -21,7 +21,7 @@ class ImageController {
                     "content": [
                         {
                             "type": "text",
-                            "text": "Descreva com riqueza de detalhes esta imagem, explorando o máximo de informações possíveis."
+                            "text": "Descreva em até 1000 caracteres com riqueza de detalhes esta imagem. Não repita muitas palavras, e seja objetivo, não esquecendo de detalhar o que for possível. Em caso de planilhas, separe os resultados. Exemplo: Na planilha, temos duas colunas. Na primeira, o nome de cada pessoa, e na segunda a mensagem, aprovado, melhorar nota ou reprovado. Aprovados: 10 (jão, maria, gustavo...), Melhorar nota: 5 (Joaquim, Fernando...), Reprovados: 3 (tiago, jeniffer, Bianca, ...)."
                         },
                         {
                             "type": "image_url",
@@ -32,7 +32,7 @@ class ImageController {
                     ]
                 }
             ],
-            "max_tokens": 500
+            "max_tokens": 600
         }
 
         try {
@@ -41,7 +41,6 @@ class ImageController {
                 headers: headers
             })
             const data = response.data
-            console.log(JSON.stringify(data))
             if (!data.choices) {
                 return null
             }
