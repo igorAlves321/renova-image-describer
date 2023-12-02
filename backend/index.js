@@ -11,7 +11,7 @@ app.use(express.json())
 app.use(express.urlencoded({ extended: true}))
 
 
-app.use("/image", ImageRoutes)
+app.use("/", ImageRoutes)
 
 app.listen(env.port, () => {
     console.log(`Servidor ativo na porta ${env.port}`)

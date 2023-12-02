@@ -1,6 +1,12 @@
 import env from "../environment.js"
+import axios from "axios"
 
 class ImageController {
+    constructor() {
+        this.getDetails = this.getDetails.bind(this)
+    }
+
+
     async requestDetails(imageData) {
         const headers = {
             "Content-Type": "application/json",
@@ -35,15 +41,18 @@ class ImageController {
                 headers: headers
             })
             const data = response.data
+            console.log(JSON.stringify(data))
             if (!data.choices) {
                 return null
             }
             const message = data.choices[0].message.content
             return message
         } catch (err) {
+            console.log(err)
             return null
         }
     }
+
 
     async getDetails(req, res) {
         const { image } = req.body
@@ -51,13 +60,19 @@ class ImageController {
             return res.status(400).json({ message: "Image is required" })
         }
 
-        const imageInfo = await this.requestDetails(image)
-        if (!imageInfo) {
+        const infoImage = await this.requestDetails(image)
+        if (!infoImage) {
             return res.status(500).json({
                 message: "Não foi possível obter detalhes da imagem."
             })
         }
+
+        return res.status(200).json({
+            message: "Informações da imagem",
+            data: infoImage
+        })
     }
+
 }
 
 export default ImageController
