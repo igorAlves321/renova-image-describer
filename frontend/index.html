@@ -13,11 +13,10 @@
     <div id="container">
         <input type="file" accept="image/*" id="inptFile" style="display: none;">
         <button id="btnAddFile">Choose a file</button>
-        <label for="text">Text</label>
-        <input type="text" id="text" placeholder="Enter your question" maxlength="200" autocomplete="off">
-        <div id="preview">
+        <div id="preview" aria-live="assertive">
             <img id="fileImage" src="" alt="">
         </div>
+        <div id="resultado" aria-live="assertive"></div>
     </div>
     <script src="script.js"></script>
 </body>
