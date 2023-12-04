@@ -48,6 +48,7 @@ function imageEvents() {
                 console.log("Erro ao obter informações do servidor")
                 btnCopyText.style.display = "none"
             dvResult.innerHTML = "Erro ao obter informações do servidor."
+            fileImage.src = ""
             }
 
             musicLoop.pause()
