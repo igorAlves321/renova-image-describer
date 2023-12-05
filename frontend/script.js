@@ -6,6 +6,7 @@ musicLoop.volume = 0.3
 
 const btnAddImage = document.getElementById("btnAddFile")
 const dvResult = document.getElementById("result")
+const dvDescricao = document.getElementById("dvDescricao")
 const fileImage = document.getElementById("fileImage")
 const btnCopyText = document.getElementById("btnCopyText")
 
@@ -41,7 +42,7 @@ function imageEvents() {
 
                 let data = await result.json()
                 data = data.data
-                fileImage.setAttribute("alt", data)
+                dvDescricao.innerHTML = data
             dvResult.innerHTML = ""
                 btnCopyText.style.display = "block"
             } catch (err) {
@@ -64,13 +65,14 @@ function imageEvents() {
 }
 
 btnCopyText.addEventListener("click", function() {
-    if (!fileImage.alt) {
-    dvResult.innerHTML = "Selecione uma imagem"
+    if(btnCopyText.style.display == "none") return
+    if (!dvDescricao.innerHTML) {
+    dvResult.innerHTML = "Selecione uma imagem."
         setTimeout(() => {
         dvResult.innerHTML = ""
         }, 5000)
     } else {
-        navigator.clipboard.writeText(fileImage.alt)
+        navigator.clipboard.writeText(dvDescricao.innerHTML)
     dvResult.innerHTML = "Texto copiado!"
         setTimeout(() => {
         dvResult.innerHTML = ""
