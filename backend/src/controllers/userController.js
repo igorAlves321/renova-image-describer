@@ -15,6 +15,21 @@ class UserController {
         return res.status(200).json(users)
     }
 
+<<<<<<< HEAD
+    async getById(req, res) {  // Nova função para obter um usuário pelo ID
+        const id = req.params.id
+        const user = await prisma.user.findUnique({
+            where: { id },
+        })
+        if (user) {
+            return res.status(200).json(user)
+        } else {
+            return res.status(404).send('Usuário não encontrado')
+        }
+    }
+
+=======
+>>>>>>> a05b4b89edace4ccc3797c986407247f73b79ce7
     async update(req, res) {
         const user = await prisma.user.update({
             where: { id: req.params.id },
