@@ -1,6 +1,10 @@
 const apiUrl = 'http://localhost:3000/user';
+//função
+<<<<<<< HEAD
 
-
+=======
+// Função para cadastrar usuário
+>>>>>>> 117c2a1ac6a0b097b8437db072a16611b2a0de8b
 async function addUser(userData) {
     try {
         const response = await fetch(`${apiUrl}/create`, {
@@ -19,7 +23,11 @@ async function addUser(userData) {
     }
 }
 
+<<<<<<< HEAD
 // Função para obter usuários
+=======
+
+>>>>>>> 117c2a1ac6a0b097b8437db072a16611b2a0de8b
 async function getUsers() {
     try {
         const response = await fetch(`${apiUrl}/read`);
@@ -115,7 +123,11 @@ async function editUser(userId) {
             document.getElementById('editUserId').value = user.id;
             document.getElementById('editName').value = user.name;
             document.getElementById('editEmail').value = user.email;
+<<<<<<< HEAD
             // Preencha outros campos conforme necessário
+=======
+
+>>>>>>> 117c2a1ac6a0b097b8437db072a16611b2a0de8b
             var editModal = new bootstrap.Modal(document.getElementById('editUserModal'));
             editModal.show();
         } else {
@@ -132,11 +144,19 @@ async function saveUserChanges() {
     const updatedUserData = {
         name: document.getElementById('editName').value,
         email: document.getElementById('editEmail').value,
+<<<<<<< HEAD
         // Obter outros campos conforme necessário
     };
 
     try {
         // Continuação da função saveUserChanges
+=======
+
+    };
+
+    try {
+
+>>>>>>> 117c2a1ac6a0b097b8437db072a16611b2a0de8b
         await updateUser(userId, updatedUserData);
         var editModal = bootstrap.Modal.getInstance(document.getElementById('editUserModal'));
         editModal.hide();
@@ -153,7 +173,11 @@ document.getElementById('addUserForm').addEventListener('submit', function(event
     const userData = {
         name: formData.get('name'),
         email: formData.get('email'),
+<<<<<<< HEAD
         password: formData.get('password'), // Considere remover ou lidar com a senha de forma segura
+=======
+        password: formData.get('password'), 
+>>>>>>> 117c2a1ac6a0b097b8437db072a16611b2a0de8b
     };
     addUser(userData);
 });
