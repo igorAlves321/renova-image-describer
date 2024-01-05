@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Cadastrar Usuário</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <!-- Cabeçalho com nome do usuário -->
+    <div class="container-fluid mt-5">
+        <div class="text-center">
+            <h1 id="userGreeting"></h1> <!-- Onde o nome do usuário será exibido -->
+        </div>
+
+        <div class="row">
+            <div class="col-12">
+                <h2 class="text-center">Cadastrar Novo Usuário</h2>
+                <form id="addUserForm">
+                    <div class="mb-3">
+                        <label for="name" class="form-label">Nome:</label>
+                        <input type="text" class="form-control" id="name" name="name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Email:</label>
+                        <input type="email" class="form-control" id="email" name="email" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="password" class="form-label">Senha:</label>
+                        <input type="password" class="form-control" id="password" name="password" required>
+                    </div>
+                    <div class="mb-3" id="roleSelection" style="display: none;">
+                        <label for="role" class="form-label">Papel:</label>
+                        <select class="form-control" id="role" name="role">
+                            <option value="user">Usuário</option>
+                            <option value="admin">Administrador</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Cadastrar Usuário</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Link para voltar no final da página -->
+        <div class="text-center mt-4">
+            <a href="admin.html" class="btn btn-secondary">Voltar</a>
+        </div>
+    </div>
+
+    <!-- Scripts Bootstrap e JavaScript -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="cadastrarUsuario.js"></script> <!-- Seu script JS -->
+    <script>
+        // Script para mostrar o nome do usuário
+        document.addEventListener('DOMContentLoaded', () => {
+            const userGreeting = document.getElementById('userGreeting');
+            const token = localStorage.getItem('token');
+            if (token) {
+                const payload = JSON.parse(atob(token.split('.')[1]));
+                userGreeting.textContent = `Olá, ${payload.name || 'Usuário'}`; // Adiciona o nome do usuário ao cabeçalho
+            }
+        });
+    </script>
+</body>
+</html>
