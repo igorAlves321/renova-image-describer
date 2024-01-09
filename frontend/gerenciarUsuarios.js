@@ -1,4 +1,4 @@
-const apiUrl = 'http://localhost:3000/user';
+const apiUrl = 'http://localhost:3000';
 
 // Função para obter usuários
 async function getUsers() {

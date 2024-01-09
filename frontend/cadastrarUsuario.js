@@ -1,4 +1,5 @@
-const apiUrl = 'http://localhost:3000/user';
+const apiUrl = 'http://localhost:3000';
+
 
 // Função para verificar se o usuário é um administrador e mostrar a seleção de papel
 function showRoleSelectionIfAdmin() {

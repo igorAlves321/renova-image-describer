@@ -1,0 +1,4 @@
+curl -X POST http://localhost:3000/login -H "Content-Type: application/json" -d "{\"email\": \"igor@igor\", \"password\": \"igor\"}"
+npx prisma migrate dev
+{"token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI4YTAzNGVkNS00MDk5LTQ1OGQtYTc0MC00NjkxOGNiYjIwZGMiLCJuYW1lI
+joiaWdvciIsInJvbGUiOiJ1c2VyIiwiaWF0IjoxNzA0NjAzODk4LCJleHAiOjE3MDQ2OTAyOTh9.jdU58CIkE4tlJIOhZ9WCfWDtszYwRqOMa1hnrsnJ8dI"

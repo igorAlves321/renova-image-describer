@@ -11,9 +11,19 @@ datasource db {
 }
 
 model User {
-  id String @unique @id @default(uuid())
-  name String
-  email String @unique
-  password String
-  role     String   
+  id                String            @id @default(uuid())
+  name              String
+  email             String            @unique
+  password          String
+  role              String
+  imageDescriptions ImageDescription[]
+}
+
+model ImageDescription {
+  id          String @id @default(uuid())
+  imageUrl    String
+  description String
+  title       String   // Novo campo para o título
+  userId      String
+  user        User   @relation(fields: [userId], references: [id])
 }
