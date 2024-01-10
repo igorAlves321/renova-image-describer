@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Renova Image Describer: Descreva suas imagens de maneira fácil e rápida</title>
+</head>
+<body>
+    <div id="navbar">
+        <a href="historico.html">Histórico de Descrições</a>
+    </div>
+    <h1>Renova Image Describer</h1>
+    <div id="container">
+        <input type="file" accept="image/*" id="inptFile" style="display: none;">
+        <button id="btnAddFile">Escolher arquivo</button>
+        <div id="preview">
+            <img id="fileImage" src="" alt="Imagem pré-visualizada aqui">
+        </div>
+        <button id="btnCopyText" style="display: none;" accesskey="c">Copiar</button>
+        <button id="btnSaveDescription" style="display: none;">Salvar Descrição</button>
+        <div id="dvDescricao" aria-live="assertive"></div>
+        <div id="result" aria-live="assertive"></div>
+    </div>
+
+    <!-- Modal para inserção do título -->
+    <div class="modal fade" id="titleModal" tabindex="-1" aria-labelledby="titleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="titleModalLabel">Insira o Título da Descrição</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Fechar">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <input type="text" id="modalImageTitle" class="form-control" placeholder="Título da imagem">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
+                    <button type="button" class="btn btn-primary" id="saveTitle">Salvar Título</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>

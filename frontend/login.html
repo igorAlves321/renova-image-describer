@@ -10,10 +10,14 @@
         <div class="card" style="width: 20rem;">
             <div class="card-body">
                 <h2 class="card-title text-center">Login</h2>
+
+                <!-- Contêiner de Mensagens -->
+                <div id="messageContainer" class="alert" role="alert" style="display: none;"></div>
+
                 <form id="loginForm">
                     <div class="mb-3">
                         <label for="loginEmail" class="form-label">Email</label>
-                        <input type="email" class="form-control" id="loginEmail" placeholder="Digite seu email" required aria-describedby="emailHelp">
+                        <input type="email" class="form-control" id="loginEmail" placeholder="Digite seu email" required>
                     </div>
                     <div class="mb-3">
                         <label for="loginPassword" class="form-label">Senha</label>
@@ -25,6 +29,7 @@
         </div>
     </div>
 
-    <script src="cadastrarUsuario.js"></script> <!-- Seu script JS -->
+    <!-- Inclua aqui o seu script de login -->
+    <script src="cadastrarUsuario.js"></script>
 </body>
 </html>

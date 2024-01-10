@@ -1,5 +1,16 @@
 const apiUrl = 'http://localhost:3000';
 
+// Função para mostrar mensagens no contêiner
+function showMessage(message, type) {
+    const messageContainer = document.getElementById('messageContainer');
+    messageContainer.textContent = message;
+    messageContainer.className = `alert alert-${type}`;
+    messageContainer.style.display = 'block';
+
+    setTimeout(() => {
+        messageContainer.style.display = 'none';
+    }, 4000); // A mensagem será ocultada após 4 segundos
+}
 
 // Função para verificar se o usuário é um administrador e mostrar a seleção de papel
 function showRoleSelectionIfAdmin() {
@@ -25,10 +36,10 @@ async function addUser(userData) {
         if (!response.ok) {
             throw new Error('Falha ao adicionar usuário');
         }
-        alert('Usuário cadastrado com sucesso!');
+        showMessage('Usuário cadastrado com sucesso!', 'success');
     } catch (error) {
         console.error('Erro ao cadastrar usuário:', error);
-        alert('Erro ao cadastrar usuário.');
+        showMessage('Erro ao cadastrar usuário.', 'danger');
     }
 }
 
@@ -50,17 +61,17 @@ async function loginUser(email, password) {
 
         const userRole = getUserRoleFromToken(data.token);
         if (userRole === 'admin') {
-    window.location.href = 'admin.html'; // Caminho relativo para a página do administrador
+            window.location.href = 'admin.html';
         } else {
-    window.location.href = 'index.html'; // Caminho relativo para a página inicial
+            window.location.href = 'describer.html';
         }
+        showMessage('Login realizado com sucesso!', 'success');
     } catch (error) {
         console.error('Erro no login:', error);
-        alert('Erro no login.');
+        showMessage('Erro no login.', 'danger');
     }
 }
 
-// Função para realizar o login do usuário
 // Função para decodificar o token JWT e obter o papel do usuário
 function getUserRoleFromToken(token) {
     const base64Url = token.split('.')[1];
@@ -80,7 +91,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (addUserForm) {
         showRoleSelectionIfAdmin();
-
         addUserForm.addEventListener('submit', function(event) {
             event.preventDefault();
             const formData = new FormData(event.target);
