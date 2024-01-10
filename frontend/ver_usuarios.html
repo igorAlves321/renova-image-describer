@@ -8,9 +8,12 @@
 </head>
 <body>
     <header class="container-fluid mt-5">
-        <h1 class="text-center">Usuários Cadastrados</h1>
+        <div class="d-flex justify-content-between align-items-center">
+            <h1 class="text-center">Usuários Cadastrados</h1>
+            <!-- Botão de Logout -->
+            <button id="logoutButton" class="btn btn-secondary">Sair</button>
+        </div>
         <div id="userCount" class="text-center"></div>
-
         <!-- Contêiner de Mensagens -->
         <div id="messageContainer" class="alert" role="alert" style="display: none;"></div>
     </header>
@@ -57,5 +60,6 @@
     <!-- Scripts Bootstrap e JavaScript -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="gerenciarUsuarios.js"></script>
+    <script src="cadastrarUsuario.js"></script>
 </body>
 </html>

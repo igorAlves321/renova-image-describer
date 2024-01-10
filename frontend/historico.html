@@ -9,7 +9,11 @@
 </head>
 <body>
     <div class="container mt-4">
-        <h1 class="mb-4 text-center">Histórico de Descrições de Imagens</h1>
+        <div class="d-flex justify-content-between mb-4">
+            <h1 class="mb-4 text-center">Histórico de Descrições de Imagens</h1>
+            <!-- Botão de Logout -->
+            <button id="logoutButton" class="btn btn-secondary">Sair</button>
+        </div>
         <div id="historicoContainer" class="list-group">
             <!-- Os links do histórico serão carregados aqui -->
         </div>
@@ -38,5 +42,6 @@
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script src="historico.js"></script>
+    <script src="cadastrarUsuario.js"></script>
 </body>
 </html>

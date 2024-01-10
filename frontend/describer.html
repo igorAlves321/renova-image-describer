@@ -8,11 +8,28 @@
     <title>Renova Image Describer: Descreva suas imagens de maneira fácil e rápida</title>
 </head>
 <body>
-    <div id="navbar">
-        <a href="historico.html">Histórico de Descrições</a>
-    </div>
-    <h1>Renova Image Describer</h1>
-    <div id="container">
+    <!-- Barra de Navegação -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">Renova Image Describer</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link" href="historico.html">Histórico de Descrições</a>
+                    </li>
+                    <li class="nav-item">
+                        <!-- Botão de Logout -->
+                        <button id="logoutButton" class="btn btn-secondary">Sair</button>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div id="container" class="mt-4">
         <input type="file" accept="image/*" id="inptFile" style="display: none;">
         <button id="btnAddFile">Escolher arquivo</button>
         <div id="preview">
@@ -45,9 +62,11 @@
         </div>
     </div>
 
+    <!-- Scripts Bootstrap e seu script.js -->
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script src="script.js"></script>
+    <script src="cadastrarUsuario.js"></script>
 </body>
 </html>

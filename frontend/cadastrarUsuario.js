@@ -12,6 +12,15 @@ function showMessage(message, type) {
     }, 4000); // A mensagem será ocultada após 4 segundos
 }
 
+// Função para realizar o logout do usuário
+function logoutUser() {
+    // Remove o token de autenticação do armazenamento local
+    localStorage.removeItem('token');
+
+    // Redireciona para a página de login
+    window.location.href = 'login.html'; // Substitua 'login.html' pelo caminho correto da sua página de login
+}
+
 // Função para verificar se o usuário é um administrador e mostrar a seleção de papel
 function showRoleSelectionIfAdmin() {
     const token = localStorage.getItem('token');
@@ -36,7 +45,13 @@ async function addUser(userData) {
         if (!response.ok) {
             throw new Error('Falha ao adicionar usuário');
         }
+        const userInfo = await response.json();
         showMessage('Usuário cadastrado com sucesso!', 'success');
+
+        // Redireciona usuários não-administradores para describer.html
+        if (userInfo.role !== 'admin') {
+            window.location.href = 'describer.html';
+        }
     } catch (error) {
         console.error('Erro ao cadastrar usuário:', error);
         showMessage('Erro ao cadastrar usuário.', 'danger');
@@ -88,6 +103,7 @@ function getUserRoleFromToken(token) {
 document.addEventListener('DOMContentLoaded', () => {
     const addUserForm = document.getElementById('addUserForm');
     const loginForm = document.getElementById('loginForm');
+    const logoutButton = document.getElementById('logoutButton');
 
     if (addUserForm) {
         showRoleSelectionIfAdmin();
@@ -111,5 +127,9 @@ document.addEventListener('DOMContentLoaded', () => {
             const password = document.getElementById('loginPassword').value;
             loginUser(email, password);
         });
+    }
+
+    if (logoutButton) {
+        logoutButton.addEventListener('click', logoutUser);
     }
 });
