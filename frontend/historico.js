@@ -1,10 +1,23 @@
 document.addEventListener('DOMContentLoaded', () => {
     fetchHistorico();
+    document.getElementById('clearHistoryButton').addEventListener('click', clearHistory);
 });
 
+// Função para mostrar mensagens no contêiner
+function showMessage(message, type) {
+    const messageContainer = document.getElementById('messageContainer');
+    messageContainer.textContent = message;
+    messageContainer.className = `alert alert-${type}`;
+    messageContainer.style.display = 'block';
+
+    setTimeout(() => {
+        messageContainer.style.display = 'none';
+    }, 4000); // A mensagem será ocultada após 4 segundos
+}
+
 async function fetchHistorico() {
-    const apiUrl = 'http://localhost:3000/user'; // URL do endpoint do histórico
-    const userId = getUserIdFromToken(); // Função para obter o ID do usuário do token
+    const apiUrl = 'http://localhost:3000/user';
+    const userId = getUserIdFromToken();
 
     try {
         const response = await fetch(`${apiUrl}/${userId}/images`, {
@@ -22,6 +35,7 @@ async function fetchHistorico() {
         }
     } catch (error) {
         console.error('Erro ao obter histórico:', error);
+        showMessage('Erro ao obter histórico.', 'danger');
     }
 }
 
@@ -51,7 +65,6 @@ function openModal(item) {
     modalImage.src = item.imageUrl;
     modalDescription.textContent = item.description;
 
-    // Substitua 'myModal' pelo ID do seu modal
     $('#myModal').modal('show');
 }
 
@@ -62,4 +75,28 @@ function getUserIdFromToken() {
         return payload.userId;
     }
     return null;
+}
+
+async function clearHistory() {
+    const apiUrl = 'http://localhost:3000/user';
+    const userId = getUserIdFromToken();
+
+    try {
+        const response = await fetch(`${apiUrl}/${userId}/clear-history`, {
+            method: 'DELETE',
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem('token')}`
+            }
+        });
+
+        if (response.ok) {
+            document.getElementById('historicoContainer').innerHTML = '';
+            showMessage('Histórico limpo com sucesso.', 'success');
+        } else {
+            throw new Error('Falha ao limpar o histórico');
+        }
+    } catch (error) {
+        console.error('Erro ao limpar o histórico:', error);
+        showMessage('Erro ao limpar o histórico.', 'danger');
+    }
 }

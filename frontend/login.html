@@ -29,7 +29,19 @@
         </div>
     </div>
 
-    <!-- Inclua aqui o seu script de login -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Verifica se o usuário já está logado e redireciona para 'describer.html'
+            const token = localStorage.getItem('token');
+            if (token && window.location.pathname !== '/describer.html') {
+                window.location.href = 'describer.html';
+            }
+        });
+
+        // Aqui você pode adicionar ou referenciar outras funções relacionadas ao login
+    </script>
+
+    <!-- Inclua aqui o seu script de cadastro de usuário -->
     <script src="cadastrarUsuario.js"></script>
 </body>
 </html>

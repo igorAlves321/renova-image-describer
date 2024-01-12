@@ -11,7 +11,7 @@ const userController = new UserController();
 const imageController = new ImageController();
 const router = express.Router();
 
-// Rotas de Usuário sem o prefixo /user
+// Rota de login
 router.post("/login", async (req, res) => {
     const { email, password } = req.body;
     try {
@@ -31,17 +31,20 @@ router.post("/login", async (req, res) => {
     }
 });
 
+// Rotas do UserController
 router.post("/create", userController.create);
 router.get("/read", authenticateToken, userController.read);
 router.get("/:id", authenticateToken, userController.getById);
 router.put("/update/:id", authenticateToken, userController.update);
 router.delete("/delete/:id", authenticateToken, userController.delete);
 
-// Rota para obter as descrições de imagens de um usuário
+// Rota para obter descrições de imagens de um usuário
 router.get("/user/:userId/images", authenticateToken, userController.getUserImageDescriptions);
 
+// Rota para limpar o histórico de um usuário
+router.delete("/user/:userId/clear-history", authenticateToken, imageController.clearHistory);
 
-// Rotas de Imagem
+// Rotas do ImageController
 router.post("/image", authenticateToken, imageController.getDetails);
 
 export default router;

@@ -7,6 +7,7 @@ const prisma = new PrismaClient();
 class ImageController {
     constructor() {
         this.getDetails = this.getDetails.bind(this);
+        this.clearHistory = this.clearHistory.bind(this);
     }
 
     async requestDetails(imageData) {
@@ -64,7 +65,7 @@ class ImageController {
                     data: {
                         imageUrl: image,
                         description: infoImage,
-                        title, // Adicionando o título
+                        title,
                         userId
                     }
                 });
@@ -82,6 +83,23 @@ class ImageController {
                 message: "Informações da imagem",
                 data: infoImage
             });
+        }
+    }
+
+    async clearHistory(req, res) {
+        const { userId } = req.params;
+
+        try {
+            await prisma.imageDescription.deleteMany({
+                where: {
+                    userId: userId
+                }
+            });
+
+            return res.status(200).send('Histórico limpo com sucesso.');
+        } catch (error) {
+            console.error(`Erro ao limpar o histórico: ${error.message}`);
+            return res.status(500).send('Erro ao limpar o histórico.');
         }
     }
 }
