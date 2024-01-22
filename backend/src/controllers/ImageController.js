@@ -49,14 +49,18 @@ class ImageController {
     }
 
     async getDetails(req, res) {
-        const { image, title, userId, saveDescription } = req.body;
+        const { image, title, userId, saveDescription, description } = req.body;
+
         if (!image || (saveDescription && !title)) {
             return res.status(400).json({ message: "Image and title are required when saving the description" });
         }
 
-        const infoImage = await this.requestDetails(image);
+        let infoImage = description;
         if (!infoImage) {
-            return res.status(500).json({ message: "Não foi possível obter detalhes da imagem." });
+            infoImage = await this.requestDetails(image);
+            if (!infoImage) {
+                return res.status(500).json({ message: "Não foi possível obter detalhes da imagem." });
+            }
         }
 
         if (saveDescription) {
