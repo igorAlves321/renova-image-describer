@@ -10,15 +10,20 @@
     <div class="container mt-4">
         <div class="d-flex justify-content-between align-items-center mb-4">
             <h1>Histórico de Descrições de Imagens</h1>
-            <!-- Botão de Logout -->
-            <button id="logoutButton" class="btn btn-secondary">Sair</button>
+            <!-- Dropdown Menu -->
+            <div class="dropdown">
+                <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-expanded="false">
+                    Opções
+                </button>
+                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                    <button id="clearHistoryButton" class="dropdown-item">Limpar Histórico</button>
+                    <button id="logoutButton" class="dropdown-item">Sair</button>
+                </div>
+            </div>
         </div>
 
         <!-- Contêiner de Mensagens -->
         <div id="messageContainer" class="alert" role="alert" style="display: none;"></div>
-
-        <!-- Botão para Limpar Histórico -->
-        <button id="clearHistoryButton" class="btn btn-danger mb-3">Limpar Histórico</button>
 
         <div id="historicoContainer" class="list-group">
             <!-- Os links do histórico serão carregados aqui -->
