@@ -1,23 +1,70 @@
-const apiUrl = 'http://localhost:3000';
+
+// Função para mostrar mensagens no contêiner
+
+function showMessage(message, type) {
+    const messageContainer = document.getElementById('messageContainer');
+    messageContainer.textContent = message;
+    messageContainer.className = `alert alert-${type}`;
+    messageContainer.style.display = 'block';
+
+    setTimeout(() => {
+        messageContainer.style.display = 'none';
+    }, 4000); // A mensagem será ocultada após 4 segundos
+}
 
 // Função para obter usuários
-async function getUsers() {
+async function getUsers(filter = '') {
     try {
         const token = localStorage.getItem('token');
-        const response = await fetch(`${apiUrl}/read`, {
+        let url = `${apiUrl}/read`;
+        if (filter) {
+            url += `?status=${filter}`;
+        }
+
+        const response = await fetch(url, {
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error('Falha ao obter usuários');
+        }
+
+        const users = await response.json();
+        return users; // Retorna diretamente o array de usuários
+    } catch (error) {
+        console.error('Erro ao obter usuários:', error);
+        return []; // Retorna um array vazio em caso de erro
+    }
+}
+
+// Função para mostrar/ocultar o menu de contexto
+function toggleMenu(menuId) {
+    const menu = document.getElementById(menuId);
+    menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+}
+
+// Função para ativar um usuário
+async function activateUser(userId) {
+    try {
+        const token = localStorage.getItem('token');
+        const response = await fetch(`${apiUrl}/activate/${userId}`, {
+            method: 'PUT',  // Ou 'POST', dependendo de como sua API está configurada
             headers: {
                 'Authorization': `Bearer ${token}`,
                 'Content-Type': 'application/json'
             }
         });
         if (!response.ok) {
-            throw new Error('Falha ao obter usuários');
+            throw new Error('Falha ao ativar usuário');
         }
-        const data = await response.json();
-        return data;
+        alert('Usuário ativado com sucesso!');
+        refreshUserList();
     } catch (error) {
-        console.error('Erro ao obter usuários:', error);
-        return { totalUsers: 0, users: [] };
+        console.error('Erro ao ativar usuário:', error);
+        alert('Erro ao ativar usuário.');
     }
 }
 
@@ -105,27 +152,45 @@ async function saveUserChanges() {
 }
 
 // Função para exibir a lista de usuários
-async function refreshUserList() {
-    const { totalUsers, users } = await getUsers();
+async function refreshUserList(filter = '') {
+    const users = await getUsers(filter);
     const userListDiv = document.getElementById('userList');
-    const userCountDiv = document.getElementById('userCount');
-    
     userListDiv.innerHTML = '';
-    userCountDiv.textContent = `Total de Usuários: ${totalUsers}`;
 
-    users.forEach(user => {
-        const userDiv = document.createElement('div');
-        userDiv.classList.add('user-item');
+    if (Array.isArray(users)) {
+        users.forEach(user => {
+            const userDiv = document.createElement('div');
+            userDiv.classList.add('user-item');
 
-        userDiv.innerHTML = `
-            <p>Nome: ${user.name}</p>
-            <p>Email: ${user.email}</p>
-            <button onclick="deleteUser('${user.id}')">Deletar ${user.name}</button>
-            <button onclick="editUser('${user.id}')">Editar ${user.name}</button>
-        `;
+            userDiv.innerHTML = `
+                <p>Nome: ${user.name}</p>
+                <p>Email: ${user.email}</p>
+                <button class="acoes-btn" onclick="toggleMenu('menu-${user.id}')">Mais Ações</button>
+                <div class="acoes-menu" id="menu-${user.id}">
+                    ${user.status !== 'ACTIVE' ? `<a href="#" onclick="activateUser('${user.id}')">Ativar Usuário</a>` : ''}
+                    <a href="#" onclick="deleteUser('${user.id}')">Excluir Usuário</a>
+                    <a href="#" onclick="editUser('${user.id}')">Alterar Usuário</a>
+                </div>
+            `;
 
-        userListDiv.appendChild(userDiv);
-    });
+            userListDiv.appendChild(userDiv);
+        });
+    } else {
+        console.error('Esperava-se um array, mas o tipo recebido foi:', typeof users);
+        // Opcional: exibir uma mensagem no UI para informar que não há usuários ou ocorreu um erro
+    }
 }
 
-document.addEventListener('DOMContentLoaded', refreshUserList);
+function setupFilterButtons() {
+    document.getElementById('filterAll').addEventListener('click', () => refreshUserList(''));
+    document.getElementById('filterActive').addEventListener('click', () => refreshUserList('ACTIVE'));
+    document.getElementById('filterInactive').addEventListener('click', () => refreshUserList('INACTIVE'));
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    refreshUserList(); // Carrega inicialmente todos os usuários
+    setupFilterButtons(); // Configura os event listeners para os botões de filtro
+});
+
+
+

@@ -7,7 +7,11 @@ const prisma = new PrismaClient();
 class UserController {
     // Método para criar um novo usuário
     async create(req, res) {
-        const { name, email, password, role } = req.body;
+        const { name, email, password, role, activationReason } = req.body;
+
+        if (activationReason && activationReason.length > 2000) {
+            return res.status(400).send("A justificativa de ativação deve ter no máximo 2000 caracteres");
+        }
 
         const existingUser = await prisma.user.findUnique({
             where: { email }
@@ -17,8 +21,6 @@ class UserController {
             return res.status(400).send("Email já está em uso");
         }
 
-        const isAdmin = req.user && req.user.role === 'admin';
-        const assignedRole = isAdmin && role ? role : 'user';
         const hashedPassword = bcrypt.hashSync(password, 10);
 
         try {
@@ -27,11 +29,18 @@ class UserController {
                     name,
                     email,
                     password: hashedPassword,
-                    role: assignedRole,
+                    role: role || 'user',
+                    activationReason
                 },
             });
 
-            return res.status(201).json({ id: user.id, name: user.name, email: user.email, role: user.role });
+            return res.status(201).json({ 
+                id: user.id, 
+                name: user.name, 
+                email: user.email, 
+                role: user.role,
+                activationReason: user.activationReason
+            });
         } catch (error) {
             logger.error(`Erro ao criar usuário: ${error.message}`);
             return res.status(500).send('Erro ao criar o usuário');
@@ -39,13 +48,24 @@ class UserController {
     }
 
     // Método para ler todos os usuários
+
     async read(req, res) {
         try {
-            const users = await prisma.user.findMany();
-            const totalUsers = await prisma.user.count();
-            return res.status(200).json({ totalUsers, users });
+            const statusFilter = req.query.status;
+            let filterConditions = {};
+
+            // Aplica o filtro se um status específico for fornecido
+            if (statusFilter) {
+                filterConditions.status = statusFilter;
+            }
+
+            const users = await prisma.user.findMany({
+                where: filterConditions
+            });
+
+            return res.status(200).json(users);
         } catch (error) {
-            logger.error(`Erro ao ler usuários: ${error.message}`);
+            console.error(`Erro ao ler usuários: ${error.message}`);
             return res.status(500).send('Erro ao ler usuários');
         }
     }
@@ -118,7 +138,41 @@ class UserController {
         }
     }
 
-    // Método para obter as descrições de imagens associadas a um usuário
+    // Método para ativar um usuário
+async activateUser(req, res) {
+    if (!(req.user && req.user.role === 'admin')) {
+        return res.status(403).send('Acesso negado');
+    }
+
+    const { userId } = req.params; 
+
+    try {
+        const user = await prisma.user.findUnique({
+            where: { id: userId },
+        });
+
+        if (!user) {
+            return res.status(404).send('Usuário não encontrado');
+        }
+
+        // Verifica se o usuário já está ativo
+        if (user.status === 'ACTIVE') {
+            return res.status(400).send('Usuário já está ativo');
+        }
+
+        const updatedUser = await prisma.user.update({
+            where: { id: userId },
+            data: { status: 'ACTIVE' },
+        });
+
+        return res.status(200).json({ message: 'Usuário ativado com sucesso', user: updatedUser });
+    } catch (error) {
+        logger.error(`Erro ao ativar usuário: ${error.message}`);
+        return res.status(500).send('Erro ao ativar usuário');
+    }
+}
+
+// Método para obter as descrições de imagens associadas a um usuário
     async getUserImageDescriptions(req, res) {
         const { userId } = req.params;
 

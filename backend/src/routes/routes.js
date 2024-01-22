@@ -17,6 +17,12 @@ router.post("/login", async (req, res) => {
     try {
         const user = await prisma.user.findUnique({ where: { email } });
         if (user && bcrypt.compareSync(password, user.password)) {
+            // Verificar se o usuário está ativo
+            if (user.status !== 'ACTIVE') {
+                return res.status(403).send('Sua conta ainda não foi ativada. Aguarde a aprovação de um administrador.');
+            }
+
+            // Usuário está ativo, prossiga com a criação do token
             const token = jwt.sign(
                 { userId: user.id, name: user.name, role: user.role },
                 process.env.JWT_SECRET,
@@ -37,6 +43,7 @@ router.get("/read", authenticateToken, userController.read);
 router.get("/:id", authenticateToken, userController.getById);
 router.put("/update/:id", authenticateToken, userController.update);
 router.delete("/delete/:id", authenticateToken, userController.delete);
+router.put("/activate/:userId", authenticateToken, userController.activateUser); // Rota para ativar um usuário
 
 // Rota para obter descrições de imagens de um usuário
 router.get("/user/:userId/images", authenticateToken, userController.getUserImageDescriptions);

@@ -33,6 +33,7 @@ function showRoleSelectionIfAdmin() {
 }
 
 // Função para adicionar usuário
+
 async function addUser(userData) {
     try {
         const response = await fetch(`${apiUrl}/create`, {
@@ -50,7 +51,7 @@ async function addUser(userData) {
 
         // Redireciona usuários não-administradores para describer.html
         if (userInfo.role !== 'admin') {
-            window.location.href = 'describer.html';
+            window.location.href = 'login.html';
         }
     } catch (error) {
         console.error('Erro ao cadastrar usuário:', error);
@@ -68,9 +69,12 @@ async function loginUser(email, password) {
             },
             body: JSON.stringify({ email, password }),
         });
+
         if (!response.ok) {
-            throw new Error('Falha no login');
+            const errorText = await response.text(); // Obter a mensagem de erro do servidor
+            throw new Error(errorText || 'Falha no login');
         }
+
         const data = await response.json();
         localStorage.setItem('token', data.token);
 
@@ -83,7 +87,7 @@ async function loginUser(email, password) {
         showMessage('Login realizado com sucesso!', 'success');
     } catch (error) {
         console.error('Erro no login:', error);
-        showMessage('Erro no login.', 'danger');
+        showMessage(error.message, 'danger'); // Exibe a mensagem de erro do servidor
     }
 }
 
@@ -114,7 +118,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 name: formData.get('name'),
                 email: formData.get('email'),
                 password: formData.get('password'),
-                role: formData.get('role') || 'user'
+                role: formData.get('role') || 'user',
+                activationReason: formData.get('activationReason')
             };
             addUser(userData);
         });

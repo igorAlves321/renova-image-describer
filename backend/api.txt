@@ -1,4 +1,5 @@
-curl -X POST http://localhost:3000/login -H "Content-Type: application/json" -d "{\"email\": \"igor@igor\", \"password\": \"igor\"}"
+curl -X POST http://localhost:3000/login -H "Content-Type: application/json" -d "{\"email\": \"admin@admin\", \"password\": \"admin\"}"
 npx prisma migrate dev
-{"token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI4YTAzNGVkNS00MDk5LTQ1OGQtYTc0MC00NjkxOGNiYjIwZGMiLCJuYW1lI
-joiaWdvciIsInJvbGUiOiJ1c2VyIiwiaWF0IjoxNzA0NjAzODk4LCJleHAiOjE3MDQ2OTAyOTh9.jdU58CIkE4tlJIOhZ9WCfWDtszYwRqOMa1hnrsnJ8dI"
+curl -X GET "http://localhost:3000/read" ^
+     -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiIzZmI5YzE1OS0yMmI2LTRiOTgtYjYzYi02MmYyMjUyOTcyOTgiLCJuYW1lIjoiYWRtaW4iLCJyb2xlIjoiYWRtaW4iLCJpYXQiOjE3MDU3MjI3MTcsImV4cCI6MTcwNTgwOTExN30.NkrqrbmNT6WxBcsQFTtDHZ1uWEQQQcK0jN0dnRxMLzM" ^
+     -H "Content-Type: application/json"
