@@ -39,6 +39,7 @@ router.post("/login", async (req, res) => {
 
 // Rotas do UserController
 router.post("/create", userController.create);
+router.put("/set-role", authenticateToken, userController.setUserRole);
 router.get("/read", authenticateToken, userController.read);
 router.get("/:id", authenticateToken, userController.getById);
 router.put("/update/:id", authenticateToken, userController.update);

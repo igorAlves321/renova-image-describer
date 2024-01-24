@@ -7,46 +7,73 @@ const prisma = new PrismaClient();
 
 class UserController {
     // Método para criar um novo usuário
-    async create(req, res) {
-        const { name, email, password, role, activationReason } = req.body;
+async create(req, res) {
+    const { name, email, password, activationReason } = req.body;
 
-        if (activationReason && activationReason.length > 2000) {
-            return res.status(400).send("A justificativa de ativação deve ter no máximo 2000 caracteres");
-        }
+    if (activationReason && activationReason.length > 2000) {
+        return res.status(400).send("A justificativa de ativação deve ter no máximo 2000 caracteres");
+    }
 
-        const existingUser = await prisma.user.findUnique({
-            where: { email }
+    const existingUser = await prisma.user.findUnique({
+        where: { email }
+    });
+
+    if (existingUser) {
+        return res.status(400).send("Email já está em uso");
+    }
+
+    const hashedPassword = bcrypt.hashSync(password, 10);
+
+    try {
+        const user = await prisma.user.create({
+            data: {
+                name,
+                email,
+                password: hashedPassword,
+                role: 'user', // Define o papel padrão como 'user'
+                activationReason
+            },
         });
 
-        if (existingUser) {
-            return res.status(400).send("Email já está em uso");
-        }
-
-        const hashedPassword = bcrypt.hashSync(password, 10);
-
-        try {
-            const user = await prisma.user.create({
-                data: {
-                    name,
-                    email,
-                    password: hashedPassword,
-                    role: role || 'user',
-                    activationReason
-                },
-            });
-
-            return res.status(201).json({ 
-                id: user.id, 
-                name: user.name, 
-                email: user.email, 
-                role: user.role,
-                activationReason: user.activationReason
-            });
-        } catch (error) {
-            logger.error(`Erro ao criar usuário: ${error.message}`);
-            return res.status(500).send('Erro ao criar o usuário');
-        }
+        return res.status(201).json({ 
+            id: user.id, 
+            name: user.name, 
+            email: user.email, 
+            role: user.role,
+            activationReason: user.activationReason
+        });
+    } catch (error) {
+        logger.error(`Erro ao criar usuário: ${error.message}`);
+        return res.status(500).send('Erro ao criar o usuário');
     }
+}
+//função que permite que o administrador defina o papel do usuário, já que como padrão ele vai vir como user.
+async setUserRole(req, res) {
+    if (!(req.user && req.user.role === 'admin')) {
+        return res.status(403).send('Acesso negado');
+    }
+
+    const { userId, newRole } = req.body;
+
+    try {
+
+        const user = await prisma.user.findUnique({ where: { id: userId } });
+
+        if (!user) {
+            return res.status(404).send('Usuário não encontrado');
+        }
+
+        const updatedUser = await prisma.user.update({
+            where: { id: userId },
+            data: { role: newRole },
+        });
+
+        return res.status(200).json({ message: 'Papel do usuário atualizado com sucesso', user: updatedUser });
+    } catch (error) {
+        logger.error(`Erro ao atualizar o papel do usuário: ${error.message}`);
+        return res.status(500).send('Erro ao atualizar o papel do usuário');
+    }
+}
 
     // Método para ler todos os usuários
 
