@@ -1,6 +1,7 @@
 import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcrypt";
-import logger from '../../logger.js'; // Ajuste o caminho conforme necessário
+import { enviarEmailDeAtivacao } from '../emailService.js';
+import logger from '../../logger.js';
 
 const prisma = new PrismaClient();
 
@@ -139,38 +140,41 @@ class UserController {
     }
 
     // Método para ativar um usuário
-async activateUser(req, res) {
-    if (!(req.user && req.user.role === 'admin')) {
-        return res.status(403).send('Acesso negado');
-    }
-
-    const { userId } = req.params; 
-
-    try {
-        const user = await prisma.user.findUnique({
-            where: { id: userId },
-        });
-
-        if (!user) {
-            return res.status(404).send('Usuário não encontrado');
+    async activateUser(req, res) {
+        if (!(req.user && req.user.role === 'admin')) {
+            return res.status(403).send('Acesso negado');
         }
 
-        // Verifica se o usuário já está ativo
-        if (user.status === 'ACTIVE') {
-            return res.status(400).send('Usuário já está ativo');
+        const { userId } = req.params;
+
+        try {
+            const user = await prisma.user.findUnique({
+                where: { id: userId },
+            });
+
+            if (!user) {
+                return res.status(404).send('Usuário não encontrado');
+            }
+
+            // Verifica se o usuário já está ativo
+            if (user.status === 'ACTIVE') {
+                return res.status(400).send('Usuário já está ativo');
+            }
+
+            const updatedUser = await prisma.user.update({
+                where: { id: userId },
+                data: { status: 'ACTIVE' },
+            });
+
+            // Chama a função para enviar o e-mail de ativação
+            await enviarEmailDeAtivacao(user.email, user.name);
+
+            return res.status(200).json({ message: 'Usuário ativado com sucesso', user: updatedUser });
+        } catch (error) {
+            logger.error(`Erro ao ativar usuário: ${error.message}`);
+            return res.status(500).send('Erro ao ativar usuário');
         }
-
-        const updatedUser = await prisma.user.update({
-            where: { id: userId },
-            data: { status: 'ACTIVE' },
-        });
-
-        return res.status(200).json({ message: 'Usuário ativado com sucesso', user: updatedUser });
-    } catch (error) {
-        logger.error(`Erro ao ativar usuário: ${error.message}`);
-        return res.status(500).send('Erro ao ativar usuário');
     }
-}
 
 // Método para obter as descrições de imagens associadas a um usuário
     async getUserImageDescriptions(req, res) {
