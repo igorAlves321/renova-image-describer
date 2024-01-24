@@ -16,7 +16,6 @@
             <span class="navbar-text mr-3">
                 <span id="userGreeting">admin</span>
             </span>
-            <!-- Botão de Navegação Colapsável -->
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Abrir menu de navegação">
                 <span class="navbar-toggler-icon"></span> Opções
             </button>
@@ -26,14 +25,16 @@
                         <a class="nav-link" href="historico.html">Histórico de Descrições</a>
                     </li>
                     <li class="nav-item">
-                        <!-- Botão de Logout -->
                         <button id="logoutButton" class="btn btn-secondary">Sair</button>
                     </li>
                 </ul>
             </div>
         </div>
     </nav>
+<div id="imageInputContainer" class="mt-4">
+    <textarea id="imagePasteArea" placeholder="Cole a imagem aqui" class="form-control"></textarea>
 
+</div>
     <div id="container" class="mt-4">
         <input type="file" accept="image/*" id="inptFile" style="display: none;">
         <button id="btnAddFile">Escolher arquivo</button>

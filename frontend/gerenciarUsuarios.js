@@ -126,9 +126,16 @@ async function editUser(userId) {
         }
         const user = await response.json();
 
+        // Preenche os campos do modal com as informações do usuário
         document.getElementById('editUserId').value = user.id;
         document.getElementById('editName').value = user.name;
         document.getElementById('editEmail').value = user.email;
+
+        // Adiciona a justificativa de ativação no modal
+        const justificationField = document.getElementById('editJustification');
+        if (justificationField) {
+            justificationField.textContent = user.activationReason || 'Não fornecida';
+        }
 
         var editModal = new bootstrap.Modal(document.getElementById('editUserModal'));
         editModal.show();

@@ -20,9 +20,21 @@ function imageEvents() {
     inptImage.addEventListener("change", readImage, false);
 }
 
-async function readImage() {
+async function readImage(inputElement = null) {
+    let file;
+    if (inputElement && inputElement.files && inputElement.files[0]) {
+        // Caso para upload de arquivo
+        file = inputElement.files[0];
+    } else if (this && this.files && this.files[0]) {
+        // Caso para colagem de imagem
+        file = this.files[0];
+    } else {
+        console.error("readImage foi chamada sem um arquivo válido.");
+        return;
+    }
+
     let fr = new FileReader();
-    fr.onload = async function (event) {
+    fr.onload = async function(event) {
         fileImage.src = event.target.result;
         const token = localStorage.getItem('token');
         
@@ -69,7 +81,8 @@ async function readImage() {
         musicLoop.pause();
         musicLoop.currentTime = 0;
     };
-    fr.readAsDataURL(this.files[0]);
+
+    fr.readAsDataURL(file);
     
     setTimeout(() => {
         btnAddImage.focus();
@@ -145,4 +158,20 @@ document.getElementById('saveTitle').addEventListener('click', async function() 
 
     $('#titleModal').modal('hide');
     modalImageTitle.value = '';
+});
+
+// Adicionando evento de colagem para capturar imagens da área de transferência
+document.addEventListener('DOMContentLoaded', () => {
+    document.getElementById('imagePasteArea').addEventListener('paste', (event) => {
+        const items = (event.clipboardData || event.originalEvent.clipboardData).items;
+        for (const item of items) {
+            if (item.type.indexOf('image') === 0) {
+                const blob = item.getAsFile();
+                const fakeInputEvent = {
+                    files: [blob]
+                };
+                readImage(fakeInputEvent);
+            }
+        }
+    });
 });
