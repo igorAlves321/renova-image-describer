@@ -160,8 +160,14 @@ document.getElementById('saveTitle').addEventListener('click', async function() 
     modalImageTitle.value = '';
 });
 
-// Adicionando evento de colagem para capturar imagens da área de transferência
 document.addEventListener('DOMContentLoaded', () => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+        window.location.href = 'login.html';
+        return;
+    }
+
+// Adicionando evento de colagem para capturar imagens da área de transferência
     document.getElementById('imagePasteArea').addEventListener('paste', (event) => {
         const items = (event.clipboardData || event.originalEvent.clipboardData).items;
         for (const item of items) {
