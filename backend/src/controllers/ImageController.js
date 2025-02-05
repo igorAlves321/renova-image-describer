@@ -1,6 +1,5 @@
 import axios from "axios";
 import { PrismaClient } from "@prisma/client";
-import env from "../environment.js";
 
 const prisma = new PrismaClient();
 
@@ -10,100 +9,168 @@ class ImageController {
         this.clearHistory = this.clearHistory.bind(this);
     }
 
-    async requestDetails(imageData) {
-        const headers = {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${env.api_key}`
-        };
-
-        const payload = {
-            "model": "gpt-4-vision-preview",
-            "messages": [
-                {
-                    "role": "user",
-                    "content": [
-                        {
-                            "type": "text",
-                            "text": "Descreva em até 1000 caracteres com riqueza de detalhes esta imagem. Não repita muitas palavras, e seja objetivo, não esquecendo de detalhar o que for possível. Em caso de planilhas, separe os resultados..."
-                        },
-                        {
-                            "type": "image_url",
-                            "image_url": {
-                                "url": imageData
-                            }
-                        }
-                    ]
-                }
-            ],
-            "max_tokens": 600
-        };
-
+    // Método para enviar a imagem Base64 para VisionBot e obter o requestId
+    async uploadImageToVisionBot(imageBase64) {
         try {
-            const response = await axios.post("https://api.openai.com/v1/chat/completions", payload, { headers });
-            const data = response.data;
-            return data.choices && data.choices.length ? data.choices[0].message.content : null;
-        } catch (err) {
-            console.log(err);
+            console.log("Enviando imagem para VisionBot...");
+
+            // Remover prefixo Base64, se houver
+            const sanitizedBase64 = imageBase64.replace(/^data:image\/\w+;base64,/, "");
+
+            const response = await axios.post("https://visionbot.ru/apiv2/in.php", 
+                new URLSearchParams({
+                    body: sanitizedBase64,
+                    lang: "pt",
+                    target: "nothing",
+                    bm: "1"
+                }), 
+                {
+                    headers: { "Content-Type": "application/x-www-form-urlencoded; charset=utf-8" }
+                }
+            );
+
+            if (response.data.status === "ok") {
+                console.log("Imagem enviada! Request ID:", response.data.id);
+                return response.data.id;
+            } else {
+                throw new Error("Erro ao fazer upload da imagem: " + response.data.status);
+            }
+        } catch (error) {
+            console.error("Erro ao enviar imagem para VisionBot:", error.message);
             return null;
         }
     }
 
-    async getDetails(req, res) {
-        const { image, title, userId, saveDescription, description } = req.body;
+    // Método para buscar a descrição gerada pela VisionBot
+    async getVisionBotResult(requestId) {
+        const maxRetries = 18; // Tentaremos por 90 segundos (5s por tentativa)
+        
+        for (let i = 0; i < maxRetries; i++) {
+            console.log(`Tentativa ${i + 1}: buscando resultado da API...`);
 
-        if (!image || (saveDescription && !title)) {
-            return res.status(400).json({ message: "Image and title are required when saving the description" });
+            try {
+                const response = await axios.post("https://visionbot.ru/apiv2/res.php",
+                    new URLSearchParams({ id: requestId }), 
+                    {
+                        headers: { "Content-Type": "application/x-www-form-urlencoded; charset=utf-8" }
+                    }
+                );
+
+                if (response.data.status === "ok") {
+                    console.log("Descrição recebida da API VisionBot:", response.data.text);
+                    return response.data.text;
+                } else if (response.data.status === "notready") {
+                    console.log("A descrição ainda não está pronta, aguardando...");
+                    await new Promise(resolve => setTimeout(resolve, 5000)); // Espera 5 segundos
+                } else {
+                    throw new Error("Erro ao obter o resultado: " + response.data.status);
+                }
+            } catch (error) {
+                console.error("Erro ao buscar resultado da VisionBot:", error.message);
+                return null;
+            }
+        }
+
+        throw new Error("Tempo limite excedido ao buscar descrição.");
+    }
+
+    // Método para obter a descrição da imagem
+    async getDetails(req, res) {
+        console.log("Recebendo requisição no endpoint /image com dados:", req.body);
+
+        const { imagePath, title, userId, saveDescription, description } = req.body;
+
+        if (!imagePath || (saveDescription && !title)) {
+            console.error("Dados inválidos na requisição:", req.body);
+            return res.status(400).json({
+                message: "Caminho da imagem e título são obrigatórios ao salvar a descrição.",
+            });
         }
 
         let infoImage = description;
         if (!infoImage) {
-            infoImage = await this.requestDetails(image);
-            if (!infoImage) {
-                return res.status(500).json({ message: "Não foi possível obter detalhes da imagem." });
+            try {
+                console.log("Processando imagem Base64 diretamente...");
+
+                // Envia a imagem para VisionBot e obtém o requestId
+                const requestId = await this.uploadImageToVisionBot(imagePath);
+
+                if (!requestId) {
+                    console.error("Não foi possível obter um requestId.");
+                    return res.status(500).json({ message: "Erro ao processar a imagem." });
+                }
+
+                // Obtém a descrição da imagem
+                infoImage = await this.getVisionBotResult(requestId);
+
+                if (!infoImage) {
+                    console.error("A API VisionBot não retornou uma descrição.");
+                    return res.status(500).json({ message: "Não foi possível obter detalhes da imagem." });
+                }
+
+                console.log("Descrição gerada pela API VisionBot:", infoImage);
+            } catch (error) {
+                console.error("Erro ao processar a imagem:", {
+                    message: error.message,
+                    stack: error.stack,
+                });
+                return res.status(500).json({ message: "Erro ao processar a imagem." });
             }
         }
 
         if (saveDescription) {
             try {
+                console.log("Salvando descrição no banco de dados...");
+
                 const imageDescription = await prisma.imageDescription.create({
                     data: {
-                        imageUrl: image,
+                        imageUrl: imagePath, // Pode ser a string Base64 ou um URL real
                         description: infoImage,
                         title,
-                        userId
-                    }
+                        userId,
+                    },
                 });
 
+                console.log("Descrição salva com sucesso no banco de dados:", imageDescription);
                 return res.status(200).json({
                     message: "Descrição da imagem salva com sucesso",
-                    data: imageDescription
+                    data: imageDescription,
                 });
             } catch (error) {
-                console.error(`Erro ao salvar descrição da imagem: ${error.message}`);
-                return res.status(500).send('Erro ao salvar descrição da imagem');
+                console.error("Erro ao salvar descrição no banco de dados:", {
+                    message: error.message,
+                    stack: error.stack,
+                });
+                return res.status(500).send("Erro ao salvar descrição no banco de dados.");
             }
         } else {
+            console.log("Retornando descrição gerada ao cliente.");
             return res.status(200).json({
                 message: "Informações da imagem",
-                data: infoImage
+                data: infoImage,
             });
         }
     }
 
+    // Método para limpar o histórico de um usuário
     async clearHistory(req, res) {
         const { userId } = req.params;
 
+        console.log("Recebendo requisição para limpar histórico do usuário:", userId);
+
         try {
-            await prisma.imageDescription.deleteMany({
-                where: {
-                    userId: userId
-                }
+            const result = await prisma.imageDescription.deleteMany({
+                where: { userId },
             });
 
-            return res.status(200).send('Histórico limpo com sucesso.');
+            console.log(`Histórico limpo com sucesso para o usuário ${userId}. Registros deletados:`, result.count);
+            return res.status(200).send("Histórico limpo com sucesso.");
         } catch (error) {
-            console.error(`Erro ao limpar o histórico: ${error.message}`);
-            return res.status(500).send('Erro ao limpar o histórico.');
+            console.error("Erro ao limpar o histórico:", {
+                message: error.message,
+                stack: error.stack,
+            });
+            return res.status(500).send("Erro ao limpar o histórico.");
         }
     }
 }
